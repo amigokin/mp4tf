@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Extractor de Frames MP4</title>
+    
+    <!-- PWA / Mobile Meta Tags -->
+    <meta name="theme-color" content="#1a73e8">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="application-name" content="Frame Extractor">
+    
+    <!-- Icono usando Emoji -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎬</text></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22white%22/><text x=%2250%22 y=%2250%22 dominant-baseline=%22central%22 text-anchor=%22middle%22 font-size=%2270%22>🎬</text></svg>">
+
+    <style>
+        :root {
+            --primary: #1a73e8;
+            --primary-dark: #1557b0;
+            --secondary: #34a853;
+            --bg: #f0f2f5;
+            --surface: #ffffff;
+            --error: #d93025;
+            --gray-light: #f1f3f4;
+            --text: #333;
+        }
+
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            padding: 20px; 
+            background: var(--bg); 
+            color: var(--text);
+            min-height: 100vh;
+            overscroll-behavior-y: none;
+        }
+
+        .container { 
+            max-width: 700px; 
+            width: 100%;
+            background: var(--surface); 
+            padding: 1.5rem; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08); 
+            text-align: center;
+        }
+
+        h2 { margin-top: 0; color: #444; font-size: 1.5rem; }
+        
+        /* Video Player Styles */
+        video {
+            width: 100%;
+            max-height: 50vh;
+            background: #000;
+            border-radius: 8px;
+            margin: 10px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            outline: none;
+        }
+
+        /* Result Image */
+        #resultImage { 
+            max-width: 100%; 
+            margin-top: 15px; 
+            border: 2px solid #eee; 
+            border-radius: 8px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Controls Containers */
+        .controls-area {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        /* Navigation Buttons specifically */
+        .nav-controls {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            background: var(--gray-light);
+            padding: 10px;
+            border-radius: 12px;
+        }
+
+        .btn { 
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--primary); 
+            color: white; 
+            padding: 12px 20px;
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            font-size: 16px;
+            min-height: 44px;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+        .btn:active { transform: scale(0.96); }
+        .btn:disabled { background: #ccc; cursor: not-allowed; transform: none; }
+
+        .btn-nav {
+            background: white;
+            color: var(--text);
+            border: 1px solid #ddd;
+            padding: 10px 15px;
+            font-size: 18px; /* Bigger icons */
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            min-width: 50px;
+        }
+        .btn-nav:hover { background: #fff; border-color: var(--primary); color: var(--primary); }
+        .btn-nav.primary-nav { background: var(--primary); color: white; border: none; }
+
+        .btn-secondary { background: var(--secondary); }
+        .btn-secondary:hover { background: #2d8f46; }
+        
+        .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
+        .btn-outline:hover { background: #eff6ff; }
+
+        input[type="file"] { display: none; }
+        
+        .hidden { display: none; }
+        
+        .timestamp-display {
+            font-family: monospace;
+            font-size: 1.2em;
+            color: #555;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .keyboard-hint {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 10px;
+            font-size: 0.85em;
+            color: #666;
+            margin-bottom: 20px;
+            display: none; 
+        }
+        
+        @media (min-width: 768px) {
+            .keyboard-hint { display: inline-block; }
+            body { padding: 40px 20px; }
+        }
+
+        #outputArea {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Extractor de Frames MP4</h2>
+    
+    <!-- Input File -->
+    <label for="videoInput" style="display:block; width:100%;">
+        <input type="file" id="videoInput" accept="video/mp4">
+        <div style="border: 2px dashed #ccc; padding: 30px; border-radius: 12px; cursor: pointer; background: #fafafa;">
+            📂 Toca para seleccionar video
+        </div>
+    </label>
+
+    <!-- Video Player Area (Hidden until file selected) -->
+    <div id="videoArea" class="hidden">
+        <video id="mainVideo" controls playsinline tabindex="0"></video>
+        
+        <div class="timestamp-display">
+            <span id="timeDisplay">00:00.00</span> / <span id="durationDisplay">00:00.00</span>
+        </div>
+
+        <!-- NEW: Touch Navigation Controls -->
+        <div class="nav-controls">
+            <button id="rw1sBtn" class="btn btn-nav" title="-1 Segundo">⏪</button>
+            <button id="rwFrameBtn" class="btn btn-nav" title="-1 Frame">➖</button>
+            <button id="playPauseBtn" class="btn btn-nav primary-nav" title="Play/Pause">⏯</button>
+            <button id="ffFrameBtn" class="btn btn-nav" title="+1 Frame">➕</button>
+            <button id="ff1sBtn" class="btn btn-nav" title="+1 Segundo">⏩</button>
+        </div>
+
+        <!-- Solo visible en PC -->
+        <div class="keyboard-hint">
+            ⌨️ <strong>Atajos PC:</strong> ←/→ Frame | Shift+←/→ 1s | Espacio Play
+        </div>
+
+        <div class="controls-area">
+            <button id="jumpEndBtn" class="btn btn-outline">⏭ Final</button>
+            <button id="captureBtn" class="btn">📷 CAPTURAR</button>
+        </div>
+    </div>
+    
+    <!-- Canvas (Always hidden, used for processing) -->
+    <canvas id="canvas" class="hidden"></canvas>
+
+    <!-- Output Area (Hidden until capture) -->
+    <div id="outputArea" class="hidden">
+        <h3>Frame Capturado</h3>
+        <img id="resultImage" alt="Resultado">
+        
+        <div class="controls-area" style="margin-top: 20px;">
+            <a id="downloadBtn" class="btn">Descargar</a>
+            <button id="copyBtn" class="btn btn-secondary">Copiar</button>
+        </div>
+        <p id="statusMsg" style="color: #666; font-size: 0.9em; margin-top: 10px;"></p>
+    </div>
+</div>
+
+<script>
+    // Referencias al DOM
+    const videoInput = document.getElementById('videoInput');
+    const videoArea = document.getElementById('videoArea');
+    const mainVideo = document.getElementById('mainVideo');
+    const timeDisplay = document.getElementById('timeDisplay');
+    const durationDisplay = document.getElementById('durationDisplay');
+    const jumpEndBtn = document.getElementById('jumpEndBtn');
+    const captureBtn = document.getElementById('captureBtn');
+    
+    // Botones de Navegación Táctil
+    const rw1sBtn = document.getElementById('rw1sBtn');
+    const rwFrameBtn = document.getElementById('rwFrameBtn');
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    const ffFrameBtn = document.getElementById('ffFrameBtn');
+    const ff1sBtn = document.getElementById('ff1sBtn');
+
+    const outputArea = document.getElementById('outputArea');
+    const resultImage = document.getElementById('resultImage');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const copyBtn = document.getElementById('copyBtn');
+    const statusMsg = document.getElementById('statusMsg');
+    
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+
+    let currentBlob = null; 
+
+    function formatTime(seconds) {
+        if (isNaN(seconds)) return "00:00.00";
+        const m = Math.floor(seconds / 60);
+        const s = Math.floor(seconds % 60);
+        const ms = Math.floor((seconds % 1) * 100); 
+        return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}.${String(ms).padStart(2, '0')}`;
+    }
+
+    // 1. Cargar Video
+    videoInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const fileURL = URL.createObjectURL(file);
+        mainVideo.src = fileURL;
+        videoArea.classList.remove('hidden');
+        outputArea.classList.add('hidden');
+        videoInput.parentElement.style.display = 'none';
+        mainVideo.focus();
+
+        mainVideo.onloadedmetadata = function() {
+            durationDisplay.textContent = formatTime(mainVideo.duration);
+            timeDisplay.textContent = "00:00.00";
+        };
+    });
+
+    // 2. Actualizar UI
+    mainVideo.addEventListener('timeupdate', function() {
+        timeDisplay.textContent = formatTime(mainVideo.currentTime);
+    });
+
+    // 3. Funciones de Navegación (Reutilizables para teclado y touch)
+    const frameTime = 0.04; // aprox 1 frame @ 25fps
+    
+    function stepFrame(direction) {
+        mainVideo.pause();
+        mainVideo.currentTime += (direction * frameTime);
+    }
+    
+    function stepSecond(direction) {
+        mainVideo.pause();
+        mainVideo.currentTime += direction;
+    }
+    
+    function togglePlay() {
+        if (mainVideo.paused) mainVideo.play();
+        else mainVideo.pause();
+    }
+
+    // 4. Event Listeners para Botones Táctiles
+    rw1sBtn.addEventListener('click', () => stepSecond(-1));
+    rwFrameBtn.addEventListener('click', () => stepFrame(-1));
+    ffFrameBtn.addEventListener('click', () => stepFrame(1));
+    ff1sBtn.addEventListener('click', () => stepSecond(1));
+    playPauseBtn.addEventListener('click', togglePlay);
+
+    // 5. Control por Teclado (PC)
+    document.addEventListener('keydown', function(e) {
+        if (!mainVideo.src || videoArea.classList.contains('hidden')) return;
+        if (e.target.tagName === 'INPUT') return;
+
+        switch(e.key) {
+            case 'ArrowRight':
+                e.preventDefault();
+                e.shiftKey ? stepSecond(1) : stepFrame(1);
+                break;
+            case 'ArrowLeft':
+                e.preventDefault();
+                e.shiftKey ? stepSecond(-1) : stepFrame(-1);
+                break;
+            case ' ':
+                e.preventDefault();
+                togglePlay();
+                break;
+        }
+    });
+
+    // 6. Botones Acción
+    jumpEndBtn.addEventListener('click', function() {
+        if(mainVideo.duration) {
+            mainVideo.pause();
+            mainVideo.currentTime = mainVideo.duration;
+        }
+    });
+
+    captureBtn.addEventListener('click', function() {
+        if (!mainVideo.videoWidth) return;
+        mainVideo.pause();
+
+        canvas.width = mainVideo.videoWidth;
+        canvas.height = mainVideo.videoHeight;
+        ctx.drawImage(mainVideo, 0, 0, canvas.width, canvas.height);
+
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const fileName = `mp4tf_${year}-${month}-${day}.png`;
+
+        const dataUrl = canvas.toDataURL('image/png');
+        resultImage.src = dataUrl;
+        
+        downloadBtn.href = dataUrl;
+        downloadBtn.setAttribute('download', fileName);
+
+        canvas.toBlob(function(blob) {
+            currentBlob = blob;
+        }, 'image/png');
+
+        outputArea.classList.remove('hidden');
+        statusMsg.style.color = "#666";
+        statusMsg.textContent = `Captura: ${formatTime(mainVideo.currentTime)}`;
+        outputArea.scrollIntoView({ behavior: 'smooth' });
+    });
+
+    copyBtn.addEventListener('click', async () => {
+        if (!currentBlob) return;
+        try {
+            const item = new ClipboardItem({ "image/png": currentBlob });
+            await navigator.clipboard.write([item]);
+            
+            const originalText = copyBtn.textContent;
+            copyBtn.textContent = "¡Listo!";
+            copyBtn.style.background = "#2d8f46";
+            statusMsg.style.color = "#2d8f46";
+            statusMsg.textContent = "Imagen copiada.";
+
+            setTimeout(() => { 
+                copyBtn.textContent = originalText; 
+                copyBtn.style.background = ""; 
+            }, 2000);
+        } catch (err) {
+            console.error(err);
+            statusMsg.style.color = "#d93025";
+            statusMsg.textContent = "Error al copiar (¿Estás usando HTTPS?).";
+        }
+    });
+
+</script>
+
+</body>
+</html>
