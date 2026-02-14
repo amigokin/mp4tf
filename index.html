@@ -11,6 +11,9 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="application-name" content="Frame Extractor">
+
+    <!-- CONEXIÓN CON MANIFEST.JSON (NUEVO) -->
+    <link rel="manifest" href="manifest.json">
     
     <!-- Icono usando Emoji -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎬</text></svg>">
@@ -193,7 +196,7 @@
             <span id="timeDisplay">00:00.00</span> / <span id="durationDisplay">00:00.00</span>
         </div>
 
-        <!-- NEW: Touch Navigation Controls -->
+        <!-- Touch Navigation Controls -->
         <div class="nav-controls">
             <button id="rw1sBtn" class="btn btn-nav" title="-1 Segundo">⏪</button>
             <button id="rwFrameBtn" class="btn btn-nav" title="-1 Frame">➖</button>
