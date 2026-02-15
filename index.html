@@ -265,6 +265,8 @@
             <a id="downloadBtn" class="btn">⬇️ Descargar</a>
             <!-- Copiar: Verde (Secondary) -->
             <button id="copyBtn" class="btn btn-secondary">📋 Copiar</button>
+            <!-- Home: Outline (Nuevo) -->
+            <button id="homeBtn" class="btn btn-outline">🏠 Home</button>
         </div>
         <p id="statusMsg" style="color: #666; font-size: 0.9em; margin-top: 10px;"></p>
     </div>
@@ -292,6 +294,7 @@
     const resultImage = document.getElementById('resultImage');
     const downloadBtn = document.getElementById('downloadBtn');
     const copyBtn = document.getElementById('copyBtn');
+    const homeBtn = document.getElementById('homeBtn'); // Referencia al nuevo botón
     const statusMsg = document.getElementById('statusMsg');
     
     const canvas = document.getElementById('canvas');
@@ -436,6 +439,23 @@
             statusMsg.style.color = "#d93025";
             statusMsg.textContent = "Error al copiar (¿Estás usando HTTPS?).";
         }
+    });
+
+    // 7. Botón Home
+    homeBtn.addEventListener('click', function() {
+        // Reset UI
+        videoArea.classList.add('hidden');
+        outputArea.classList.add('hidden');
+        videoInput.parentElement.style.display = 'block';
+        appTitle.classList.remove('hidden');
+
+        // Limpiar video y memoria
+        mainVideo.pause();
+        mainVideo.src = "";
+        mainVideo.load();
+        
+        // Resetear input para permitir cargar el mismo archivo de nuevo
+        videoInput.value = '';
     });
 
 </script>
