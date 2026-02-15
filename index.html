@@ -100,13 +100,21 @@
         /* Navigation Buttons specifically */
         .nav-controls {
             display: flex;
-            gap: 8px;
-            justify-content: center;
-            flex-wrap: wrap;
+            flex-direction: column; 
+            gap: 10px;
+            align-items: center;
             margin-bottom: 20px;
             background: var(--gray-light);
             padding: 10px;
             border-radius: 12px;
+            width: 100%;
+        }
+
+        /* Nueva clase para las filas de botones */
+        .nav-row {
+            display: flex;
+            gap: 15px; /* Separación cómoda entre botones */
+            justify-content: center;
             width: 100%;
         }
 
@@ -137,15 +145,16 @@
             background: white;
             color: var(--text);
             border: 1px solid #ddd;
-            padding: 8px 0; /* Ajuste para centrar mejor los iconos */
-            width: 50px;    /* Ancho fijo para los botones de nav */
-            flex: 0 0 auto; /* No estirar */
-            font-size: 20px; 
+            padding: 0 15px; /* Padding lateral flexible */
+            width: auto;     /* Ancho automático para acomodar texto */
+            min-width: 60px; /* Ancho mínimo para iconos solos */
+            flex: 0 0 auto; 
+            font-size: 18px; /* Un poco más pequeño para que quepa texto */
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             min-height: 44px;
         }
         .btn-nav:hover { background: #fff; border-color: var(--primary); color: var(--primary); }
-        .btn-nav.primary-nav { background: var(--primary); color: white; border: none; width: 60px; }
+        .btn-nav.primary-nav { background: var(--primary); color: white; border: none; width: 70px; }
 
         .btn-secondary { background: var(--secondary); }
         .btn-secondary:hover { background: #2d8f46; }
@@ -194,7 +203,7 @@
 <body>
 
 <div class="container">
-    <h2>Extractor de Frames MP4</h2>
+    <h2 id="appTitle">Extractor de Frames MP4</h2>
     
     <!-- Input File -->
     <label for="videoInput" style="display:block; width:100%;">
@@ -215,11 +224,18 @@
 
         <!-- Touch Navigation Controls -->
         <div class="nav-controls">
-            <button id="rw1sBtn" class="btn btn-nav" title="-1 Segundo">⏪</button>
-            <button id="rwFrameBtn" class="btn btn-nav" title="-1 Frame">➖</button>
-            <button id="playPauseBtn" class="btn btn-nav primary-nav" title="Play/Pause">⏯</button>
-            <button id="ffFrameBtn" class="btn btn-nav" title="+1 Frame">➕</button>
-            <button id="ff1sBtn" class="btn btn-nav" title="+1 Segundo">⏩</button>
+            <!-- Fila 1: Control de Precisión (Frames y Play) -->
+            <div class="nav-row">
+                <button id="rwFrameBtn" class="btn btn-nav" title="-1 Frame">➖</button>
+                <button id="playPauseBtn" class="btn btn-nav primary-nav" title="Play/Pause">⏯</button>
+                <button id="ffFrameBtn" class="btn btn-nav" title="+1 Frame">➕</button>
+            </div>
+            
+            <!-- Fila 2: Saltos de Tiempo (Segundos) -->
+            <div class="nav-row">
+                <button id="rw1sBtn" class="btn btn-nav" title="-1 Segundo">⏪ -1 sec</button>
+                <button id="ff1sBtn" class="btn btn-nav" title="+1 Segundo">⏩ +1 sec</button>
+            </div>
         </div>
 
         <!-- Solo visible en PC -->
@@ -255,6 +271,7 @@
 
 <script>
     // Referencias al DOM
+    const appTitle = document.getElementById('appTitle');
     const videoInput = document.getElementById('videoInput');
     const videoArea = document.getElementById('videoArea');
     const mainVideo = document.getElementById('mainVideo');
@@ -299,6 +316,7 @@
         videoArea.classList.remove('hidden');
         outputArea.classList.add('hidden');
         videoInput.parentElement.style.display = 'none';
+        appTitle.classList.add('hidden');
         mainVideo.focus();
 
         mainVideo.onloadedmetadata = function() {
