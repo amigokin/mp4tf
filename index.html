@@ -117,6 +117,7 @@
             gap: 15px; /* Separación cómoda entre botones */
             justify-content: center;
             width: 100%;
+            flex-wrap: wrap; /* Asegura que bajen si no caben en móviles muy pequeños */
         }
 
         .btn { 
@@ -225,17 +226,19 @@
 
         <!-- Touch Navigation Controls -->
         <div class="nav-controls">
-            <!-- Fila 1: Control de Precisión (Frames y Play) -->
+            <!-- Fila 1: Control de Precisión y Final -->
             <div class="nav-row">
-                <button id="rwFrameBtn" class="btn btn-nav" title="-1 Frame">➖</button>
-                <button id="playPauseBtn" class="btn btn-nav primary-nav" title="Play/Pause">⏯</button>
-                <button id="ffFrameBtn" class="btn btn-nav" title="+1 Frame">➕</button>
+                <button id="rwFrameBtn" class="btn btn-nav" title="-1 Frame">➖ -1 frm</button>
+                <button id="ffFrameBtn" class="btn btn-nav" title="+1 Frame">➕ +1 frm</button>
+                <!-- AHORA TIENE EL MISMO ESTILO QUE PLAY (AZUL) -->
+                <button id="jumpEndBtn" class="btn btn-nav primary-nav" title="Ir al Final">⏭</button>
             </div>
             
-            <!-- Fila 2: Saltos de Tiempo (Segundos) -->
+            <!-- Fila 2: Saltos de Tiempo y Play/Pause -->
             <div class="nav-row">
                 <button id="rw1sBtn" class="btn btn-nav" title="-1 Segundo">⏪ -1 sec</button>
                 <button id="ff1sBtn" class="btn btn-nav" title="+1 Segundo">⏩ +1 sec</button>
+                <button id="playPauseBtn" class="btn btn-nav primary-nav" title="Play/Pause">⏯</button>
             </div>
         </div>
 
@@ -245,8 +248,6 @@
         </div>
 
         <div class="controls-area">
-            <!-- Final: Azul (Default) -->
-            <button id="jumpEndBtn" class="btn">⏭ Final</button>
             <!-- Capturar: Verde (Secondary) -->
             <button id="captureBtn" class="btn btn-secondary">📷 Capturar</button>
         </div>
