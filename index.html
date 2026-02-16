@@ -159,11 +159,12 @@
         /* CLASE NUEVA: Para igualar el ancho de los botones con texto */
         .btn-text-width {
             flex: 1; /* Ocupan el mismo espacio disponible */
-            min-width: 110px; /* Ancho mínimo basado en el texto más largo */
+            min-width: 80px; /* Ancho mínimo ajustado para evitar desbordes en móviles pequeños */
         }
 
         .btn-nav:hover { background: #fff; border-color: var(--primary); color: var(--primary); }
-        .btn-nav.primary-nav { background: var(--primary); color: white; border: none; width: 70px; }
+        /* Eliminado el width: 70px fijo, ahora se adapta */
+        .btn-nav.primary-nav { background: var(--primary); color: white; border: none; }
 
         .btn-secondary { background: var(--secondary); }
         .btn-secondary:hover { background: #2d8f46; }
@@ -237,15 +238,16 @@
             <div class="nav-row">
                 <button id="rwFrameBtn" class="btn btn-nav btn-text-width" title="-1 Frame">➖ -1 f</button>
                 <button id="ffFrameBtn" class="btn btn-nav btn-text-width" title="+1 Frame">➕ +1 f</button>
-                <!-- AHORA TIENE EL MISMO ESTILO QUE PLAY (AZUL) -->
-                <button id="jumpEndBtn" class="btn btn-nav primary-nav" title="Ir al Final">⏭</button>
+                <!-- AHORA TIENE btn-text-width PARA IGUALAR ANCHO -->
+                <button id="jumpEndBtn" class="btn btn-nav primary-nav btn-text-width" title="Ir al Final">⏭</button>
             </div>
             
             <!-- Fila 2: Saltos de Tiempo y Play/Pause -->
             <div class="nav-row">
                 <button id="rw1sBtn" class="btn btn-nav btn-text-width" title="-1 Segundo">⏪ -1 s</button>
                 <button id="ff1sBtn" class="btn btn-nav btn-text-width" title="+1 Segundo">⏩ +1 s</button>
-                <button id="playPauseBtn" class="btn btn-nav primary-nav" title="Play/Pause">⏯</button>
+                <!-- AHORA TIENE btn-text-width PARA IGUALAR ANCHO -->
+                <button id="playPauseBtn" class="btn btn-nav primary-nav btn-text-width" title="Play/Pause">⏯</button>
             </div>
         </div>
 
